@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>글쓰기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <h2 class="navbar navbar-expand-lg bg-light" style="margin: 0px;">User Name(예시)</h2>
+    <nav class="navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Protofolio</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <!-- 사이트 수정하고 미리보기 기능 -->
+                        <a class="nav-link" aria-current="page" href="#">사이트 미리보기</a>
+                    </li>
+                    <li class="nav-item">
+                        <!-- 사이트 수정하는 기능 -->
+                        <a class="nav-link" href="#">사이트 수정</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <!-- 프로젝트 들 관리하는 기능(사진,글) -->
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Projects 관리
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Project1</a></li>
+                            <li><a class="dropdown-item" href="#">Project2</a></li>
+                            <li><a class="dropdown-item" href="#">Project3</a></li>
+                            <li><a class="dropdown-item" href="#">Project4</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <!-- 로그아웃버튼 -->
+                        <a class="nav-link" href="#">로그아웃</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="nav justify-content-end">
+                <li class="nav-item">
+                    <!-- 문의하기 버튼 -->
+                    <a class="nav-link " aria-current="page" href="#" style="border: 10px;">문의 하기</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>만든 작품들 소개🙌</h2>
+        <form action="write.jsp" method="post">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" class="form-control" id="title" placeholder="제목 입력" name="title" maxlength="100"
+                    required="required" pattern=".{4,100}">
+            </div>
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea class="form-control" rows="5" id="content" name="content" placeholder="내용 작성"></textarea>
+            </div>
+            <div class="form-group">
+                <input type="file" id="chooseFile" name="chooseFile" accept="image/*" onchange="loadFile(this)">
+            </div>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">            
+            <button type="submit" class="btn btn-default">등록</button>
+        </form>
+    </div>
+
+</body>
+
+</html>
