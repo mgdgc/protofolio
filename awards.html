@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>글쓰기</title>
+    <title>활동기간 수상내역</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -51,24 +51,64 @@
         </div>
     </nav>
     <div class="container">
-        <h2>만든 작품들 소개🙌</h2>
-        <form >
-            <div class="form-group">
-                <label for="title">제목</label>
-                <input type="text" class="form-control" id="title" placeholder="제목 입력" name="title" maxlength="100"
-                    required="required">
+        <h2>활동기간📑</h2>
+        <form action="write.jsp" method="post">
+            <label for="content">활동기간</label>
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="start date(2022.02)" aria-label="start date">
+                </div>
+                <div class="col" style="text-align: center;">
+                    <span>~</span>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="end date(2022.02)" aria-label="end date">
+                </div>
+                <label for="content" class="form-label">활동명</label>
+                <div class="col-12">
+                    <input type="text" class="form-control" placeholder="활동명">
+                </div>
+                <div>
+                    <label></label>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-outline-dark">등록</button>
+                </div>
+                <div>
+                    <label></label>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="content">내용</label>
-                <textarea class="form-control" rows="5" id="content" name="content" placeholder="누구랑 만들었는지,무엇을 만들었는지 작성"></textarea>
+        </form>
+        <h2>🏆수상내역🏆</h2>
+        <form action="write.jsp" method="post">
+            <label for="content">받은 날짜</label>
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="date(2022.02)" aria-label="start date">
+                </div>
+                <div class="col">
+                </div>
+                <label for="content">받은 상</label>
+                <div class="col-12">
+                    <div class="input-group mb-3">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">상 종류</button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" name="grand award" href="#">대상🏅</a></li>
+                            <li><a class="dropdown-item" name="gold award" href="#">금상🥇</a></li>
+                            <li><a class="dropdown-item" name="sliver award" href="#">은상🥈</a></li>
+                            <li><a class="dropdown-item" name="bronze award" href="#">동상🥉</a></li>
+                            <li><a class="dropdown-item" name="none award"href="#">참가👍</a></li>
+                        </ul>
+                        <input type="text" class="form-control" placeholder="상 이름" aria-label="Text input with dropdown button">
+                    </div>
+                </div>
+                <div class="col-12">
+                </div>
+                <div>
+                    <button type="button" class="btn btn-outline-dark">등록</button>
+                </div>
             </div>
-            <div class="form-group">
-                <div class="mb-3">
-                    <label for="content">작품의 사진</label>
-                    <input class="form-control" type="file" id="formFile">
-                  </div>
-            </div>
-            <button type="submit" class="btn btn-outline-dark">추가</button>
         </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
