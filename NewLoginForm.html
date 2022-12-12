@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .title{
+      padding: 10px 0;
+    }
+    .title h2{
+      text-align: center;
+    }
+    /* 로그인 창 부분들 */
+    *,
+    *::after,
+    *::before {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #7686a0;
+      display: grid;
+      place-content: center;
+      padding: 50px;
+    }
+
+    section {
+      width: 800px;
+      height: 400px;
+      display: flex;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    section.active .left {
+      transform: translateY(-400px);
+    }
+
+    section.active .right {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 820px) {
+      section {
+        width: 400px;
+        flex-direction: column;
+      }
+
+      section img {
+        display: none;
+      }
+
+      section .left {
+        transform: translateY(400px);
+      }
+
+      section.active .left {
+        transform: translateY(0);
+      }
+
+      section.active .right {
+        transform: translateY(-800px);
+      }
+    }
+
+    .left,
+    .right {
+      width: 400px;
+      height: 800px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      transition: 1s;
+    }
+
+    .right {
+      transform: translateY(-400px);
+    }
+
+    .sign-up,
+    .sign-in {
+      display: grid;
+      place-content: center;
+      width: 400px;
+      height: 400px;
+    }
+
+    .sign-up h1,
+    .sign-in h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .sign-up form,
+    .sign-in form {
+      display: flex;
+      flex-direction: column;
+      width: 340px;
+      gap: 20px;
+    }
+
+    .sign-up form input,
+    .sign-in form input {
+      border: 0;
+      outline: 0;
+      background: #f5f5f5;
+      padding: 10px 5px;
+      border-radius: 5px;
+      padding-left: 10px;
+    }
+
+    .sign-up form input::placeholder,
+    .sign-in form input::placeholder {
+      color: #333;
+      text-transform: capitalize;
+      font-weight: bold;
+    }
+
+    .sign-up form [type=submit],
+    .sign-in form [type=submit] {
+      display: grid;
+      place-content: center;
+      max-width: fit-content;
+      padding: 0.5em 1em;
+      color: #fff;
+      background: #00a4cc;
+      border-radius: 5px;
+      cursor: pointer;
+      text-transform: capitalize;
+      font-size: 1.2em;
+    }
+
+    .sign-up p,
+    .sign-in p {
+      text-transform: uppercase;
+      margin-top: 20px;
+    }
+
+    .sign-up p a,
+    .sign-in p a {
+      text-decoration: none;
+      font-weight: bold;
+      color: #00a4cc;
+    }
+
+    .sign-up p a:is(:hover, :visited),
+    .sign-in p a:is(:hover, :visited) {
+      color: #00a4cc;
+    }
+
+    .left input[type=submit] {
+      background: #f95700;
+    }
+
+    .left p a {
+      color: #f95700;
+    }
+
+    .left p a:is(:hover, :visited) {
+      color: #f95700;
+    }
+
+    /* 개인정보동의 부분 */
+    .section {
+      
+      display: flex;
+      flex-direction: column;
+      width: 340px;
+      gap: 20px;
+      max-height: 400px;
+      padding: 1rem;
+      overflow-y: auto;
+      direction: ltr;
+      scrollbar-color: #d4aa70 #e4e4e4;
+      scrollbar-width: thin;
+    }
+
+    .section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .section p+p {
+      margin-top: 1rem;
+    }
+
+    .section::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    .section::-webkit-scrollbar-track {
+      background-color: #e4e4e4;
+      border-radius: 100px;
+    }
+
+    .section::-webkit-scrollbar-thumb {
+      border-radius: 100px;
+      background-image: linear-gradient(180deg, #36acd0 0%, #708ad4 99%);
+      box-shadow: inset 2px 2px 5px 0 rgba(255, 255, 255, 0.5);
+    }
+    .welcome{
+      display: grid;
+      place-content: center;
+      width: 400px;
+      height: 400px;
+    }
+    .welcome h1{
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    * {
+      box-sizing: border-box;
+    }
+
+  </style>
+
+  <title>NewLoginForm</title>
+</head>
+
+<body>
+  <div class="title">
+  <h2 >Protofolio Login</h2>
+  </div>
+  <section>
+    <div class="left">
+      <div class="sign-up">
+        <h1>Create An Account</h1>
+        <form action="">
+          <input type="id" placeholder="ID" required>
+          <input type="password" placeholder="Password" required>
+          <input type="password" placeholder="Password Check" required>
+          <input type="text" placeholder="Username" required>
+          <input type="submit" value="Sign Up" onclick="toggle()">
+        </form>
+        <p>
+          Already Have an account?
+          <a href="#" id="sign-in" onclick="toggle()">Sign In.</a>
+        </p>
+      </div>
+      <div class="welcome">
+        <h1>build your portfolio🫵</h1>
+      </div>
+    </div>
+    <div class="right">
+      <div class="sign-in">
+        <h1>Sign In</h1>
+        <form action="">
+          <input type="text" placeholder="Username" />
+          <input type="password" placeholder="Password" />
+          <input type="submit" value="Login" />
+        </form>
+        <p>
+          Don't have any account? <a href="#" onclick="toggle()">Sign Up.</a>
+        </p>
+      </div>
+      <div class="section">
+        <h2>개인정보 수집 동의</h2>
+        <p>개인정보를 수집 할 때는 정보주체의 동의를 받아야 하며, 수집・이용 목적, 수집 항목, 보유 및 이용 기간, 동의 거부권 등을 알려야 함
+          개인정보를 수집할 때는 필요 최소한으로 수집해야 함
+          개인정보를 제3자에게 제공할 때는 정보주체의 동의를 받아야 함
+          개인정보는 수집한 목적 범위를 초과하여 이용하거나 제3자에게 제공 금지</p>
+        <h4 id="list-item-2">개인정보의 처리 제한</h4>
+        <p>사상・신념, 노동조합, 정당의 가입・탈퇴, 정치적 견해, 건강, 성생활 등 정보주체의 사생활을 침해할 우려가 있는 정보 처리 금지
+          고유식별정보는 법령에서 구체적으로 처리를 요구한 경우를 제외하고 원칙적으로 처리 금지</p>
+        <h4 id="list-item-3">영상정보 처리기기 규제</h4>
+        <p>...</p>
+        <h4 id="list-item-4">Item 4</h4>
+        <p>...</p>
+        <div class="ccheck">
+          <input type="checkbox" id="check_test"><span>동의합니다.</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script type="text/javascript">
+    function toggle() {
+      section = document.querySelector("section");
+      section.classList.toggle("active");
+    }
+  </script>
+
+</body>
