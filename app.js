@@ -131,14 +131,26 @@ app.post('/register', function (req, res) {
 
 // 개인 페이지
 app.get('/:userId', function (req, res) {
+    var sUserId = req.session.userId;
     var userId = req.params.userId;
-    var userPw = req.params.userPw;
+
+    var isEditable = sUserId != undefined && userId == sUserId;
+
+    var sql = "select * from portfolio where userId = ?;";
+    db.query(sql, [userId], function (error, result) {
+        if (error) throw error;
+    });
 });
 
 // 개인 페이지의 포트폴리오 상세보기
 app.get('/:userId/:portfolioId', function (req, res) {
     var userId = req.params.userId;
     var portfolioId = req.params.portfolioId;
+
+    var sql = "select * from user where userId = ?;";
+    db.query(sql, [userId], function (error, result) {
+        if (error) throw error;
+    });
 });
 
 // hostname 및 port 설정
