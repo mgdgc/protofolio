@@ -9,6 +9,15 @@
 
 ## 포트폴리오
 * /u/{userId}
-* /u/{userId}/{portfolioId}
 * /u/{userId}/write
+* /u/{userId}/project/{portfolioId}
+
+## 활동
 * /u/{userId}/activity
+* /u/{userId}/activity/{activityId}/edit
+* /u/{userId}/activity/{activityId}/delete
+
+## 수상
+* /u/{userId}/award
+* /u/{userId}/award/{awardId}/edit
+* /u/{userId}/award/{awardId}/delete

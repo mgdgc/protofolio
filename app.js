@@ -226,7 +226,7 @@ app.get('/u/:userId', function (req, res) {
 });
 
 // 개인 페이지의 포트폴리오 상세보기
-app.get('/u/:userId/:portfolioId', function (req, res) {
+app.get('/u/:userId/project/:portfolioId', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
     var portfolioId = req.params.portfolioId;
@@ -311,6 +311,66 @@ app.post('/u/:userId/activity', function (req, res) {
     });
 });
 
+// 활동 수정 페이지
+app.get('/u/:userId/activity/:activityId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const activityId = req.params.activityId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    const sql = 'select * from activity where activityId = ?;';
+    db.query(sql, [activityId], function (error, result) {
+        if (error) throw error;
+        res.render("edit_activity", { userId: userId, activityId: activityId, data: result[0] });
+    });
+});
+
+// 활동 수정 요청 처리
+app.post('/u/:userId/activity/:activityId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const activityId = req.params.activityId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    // 활동 정보 가져오기
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const activityName = req.body.activityName;
+    const activityDetail = req.body.activityDetail;
+
+    const sql = 'update activity set startDate = ?, endDate = ?, activityName = ?, activityDetail = ? where activityId = ?;';
+    db.query(sql, [startDate, endDate, activityName, activityDetail, activityId], function (error, result) {
+        if (error) throw error;
+        res.redirect('/u/' + userId);
+    });
+});
+
+// 활동 삭제 요청 처리
+app.post('/u/:userId/activity/:activityId/delete', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const activityId = req.params.activityId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    const sql = "delete from activity where activityId = ?;";
+    db.query(sql, [activityId], function (error, result) {
+        if (error) throw error;
+        res.redirect('/u/' + userId);
+    })
+});
+
 // 수상기록 작성 요청 처리
 app.post('/u/:userId/award', function (req, res) {
     const sUser = req.session.user;
@@ -332,6 +392,66 @@ app.post('/u/:userId/award', function (req, res) {
         if (error) throw error;
         res.redirect('/u/' + userId);
     });
+});
+
+// 수상기록 수정 페이지
+app.get('/u/:userId/award/:awardId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const awardId = req.params.awardId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    const sql = 'select * from award where awardId = ?;';
+    db.query(sql, [awardId], function (error, result) {
+        if (error) throw error;
+        res.render("edit_award", { userId: userId, awardId: awardId, data: result[0] });
+    });
+});
+
+// 수상기록 수정 요청 처리
+app.post('/u/:userId/award/:awardId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const awardId = req.params.awardId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    // 수정된 정보 가져오기
+    const date = req.body.date;
+    const awardName = req.body.awardName;
+    const prizeIcon = req.body.prizeIcon;
+    const prizeName = req.body.prizeName;
+
+    const sql = 'update award set date = ?, awardName = ?, prizeIcon = ?, prizeName = ? where awardId = ?;'
+    db.query(sql, [date, awardName, prizeIcon, prizeName, awardId], function (error, result) {
+        if (error) throw error;
+        res.redirect('/u/' + userId);
+    });
+});
+
+// 수상기록 삭제 요청 처리
+app.post('/u/:userId/award/:awardId/delete', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const awardId = req.params.awardId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    const sql = "delete from award where awardId = ?;";
+    db.query(sql, [awardId], function (error, result) {
+        if (error) throw error;
+        res.redirect('/u/' + userId);
+    })
 });
 
 //
