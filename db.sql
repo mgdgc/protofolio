@@ -1,6 +1,6 @@
 drop database protofolio;
 
-create database protofolio character set utf8mb4 collate utf8mb4_unicode_ci;
+create database protofolio default character set utf8mb4 collate utf8mb4_unicode_ci;
 
 create table protofolio.user(
     userId varchar(20) not null primary key,
@@ -14,7 +14,9 @@ create table protofolio.user(
 create table protofolio.portfolio(
     docId integer unsigned not null primary key auto_increment,
     title varchar(50) not null,
-    content varchar(2000) not null
+    content varchar(2000) not null,
+    userId varchar(20) not null,
+    Foreign Key (userId) REFERENCES protofolio.user(userId)
 );
 
 create table protofolio.activity(

@@ -68,7 +68,7 @@ app.get('/error', function (req, res) {
 });
 
 // favicon
-app.get('/favicon', function(req, res) {
+app.get('/favicon', function (req, res) {
 
 });
 
@@ -111,7 +111,7 @@ app.post('/login', function (req, res) {
             req.session.user.username = result[0].username;
             req.session.save(function (error) {
                 if (error) throw error;
-                res.send('logged in');
+                res.redirect('/u/' + userId);
             })
         } else {
             res.send('wrong pw');
@@ -171,14 +171,14 @@ app.get('/u/:userId/profile', function (req, res) {
         sendError(res, '로그인해주세요', '/login');
         return;
     }
-    
+
     const sql = 'select username, introduce, specialty from user where userId = ?;';
     db.query(sql, [userId], function (error, result) {
         if (error) throw error;
-        res.render('edit_profile', { 
-            userId: userId, 
-            username: result[0].username, 
-            introduce: result[0].introduce,  
+        res.render('edit_profile', {
+            userId: userId,
+            username: result[0].username,
+            introduce: result[0].introduce,
             specialty: result[0].specialty
         });
     });
@@ -216,30 +216,47 @@ app.get('/u/:userId', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
-    var isEditable = sUser != undefined && userId == sUser.userId;
+    const isEditable = sUser != undefined && userId == sUser.userId;
 
-    var sql = 'select * from portfolio where userId = ?;';
+    const userSql = 'select username, introduce, specialty from user where userId = ?;';
+    db.query(userSql, [userId], function (e, users) {
+        if (e) throw e;
+
+        const username = users[0].username;
+        const introduce = users[0].introduce;
+        const specialty = users[0].specialty;
+
+        res.render('portfolio', {
+            isEditable: isEditable,
+            userId: userId,
+            username: username,
+            introduce: introduce,
+            specialty: specialty
+        });
+    });
+
+});
+
+// project get api
+app.get('/u/:userId/project', function (req, res) {
+    const userId = req.params.userId;
+
+    const sql = 'select * from portfolio where userId = ?;';
     db.query(sql, [userId], function (error, result) {
         if (error) throw error;
-        res.render('portfolio', { isEditable: isEditable, data: result });
+        res.send(result);
     });
 });
 
-// 개인 페이지의 포트폴리오 상세보기
+// activity get api
 app.get('/u/:userId/project/:portfolioId', function (req, res) {
-    const sUser = req.session.user;
     const userId = req.params.userId;
-    var portfolioId = req.params.portfolioId;
+    const portfolioId = req.params.portfolioId;
 
-    // if (sUser != undefined && userId == sUser.userId) {
-    //     res.sendFile('/static/edit_profile.html');
-    // } else {
-    //     sendError(res, '로그인해주세요', '/login');
-    // }
-
-    var sql = 'select * from user where userId = ?;';
-    db.query(sql, [userId], function (error, result) {
+    const sql = 'select * from portfolio where docId = ?;';
+    db.query(sql, [portfolioId], function (error, result) {
         if (error) throw error;
+        res.send(result[0]);
     });
 });
 
@@ -276,8 +293,36 @@ app.post('/u/:userId/write', function (req, res) {
     });
 });
 
-// 활동 작성 페이지
+//
+//
+// Activity
+//
+//
+// activity get api
 app.get('/u/:userId/activity', function (req, res) {
+    const userId = req.params.userId;
+
+    const sql = 'select * from activity where userId = ?;';
+    db.query(sql, [userId], function (error, result) {
+        if (error) throw error;
+        res.send(result);
+    });
+});
+
+// activity get api
+app.get('/u/:userId/activity/:activityId', function (req, res) {
+    const userId = req.params.userId;
+    const activityId = req.params.activityId;
+
+    const sql = 'select * from activity where activityId = ?;';
+    db.query(sql, [activityId], function (error, result) {
+        if (error) throw error;
+        res.send(result[0]);
+    });
+});
+
+// 활동 작성 페이지
+app.get('/u/:userId/write/activity', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
@@ -289,7 +334,7 @@ app.get('/u/:userId/activity', function (req, res) {
 });
 
 // 활동 작성 요청 처리
-app.post('/u/:userId/activity', function (req, res) {
+app.post('/u/:userId/write/activity', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
@@ -371,8 +416,36 @@ app.post('/u/:userId/activity/:activityId/delete', function (req, res) {
     })
 });
 
+//
+//
+// Awards
+//
+//
+// awards get api
+app.get('/u/:userId/award', function (req, res) {
+    const userId = req.params.userId;
+
+    const sql = 'select * from award where userId = ?;';
+    db.query(sql, [userId], function (error, result) {
+        if (error) throw error;
+        res.send(result);
+    });
+});
+
+// award get api
+app.get('/u/:userId/activity/:awardId', function (req, res) {
+    const userId = req.params.userId;
+    const awardId = req.params.awardId;
+
+    const sql = 'select * from award where awardId = ?;';
+    db.query(sql, [awardId], function (error, result) {
+        if (error) throw error;
+        res.send(result[0]);
+    });
+});
+
 // 수상기록 작성 요청 처리
-app.post('/u/:userId/award', function (req, res) {
+app.post('/u/:userId/write/award', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
@@ -386,7 +459,7 @@ app.post('/u/:userId/award', function (req, res) {
     const awardName = req.body.awardName;
     const prizeName = req.body.prizeName;
     const prizeIcon = req.body.prizeIcon;
-    
+
     const sql = 'insert into award(date, awardName, prizeName, prizeIcon, userId) values (?, ?, ?, ?, ?);'
     db.query(sql, [date, awardName, prizeName, prizeIcon, userId], function (error, result) {
         if (error) throw error;
