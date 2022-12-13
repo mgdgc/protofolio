@@ -1,3 +1,9 @@
+# DB 인증 정보 파일
+db_auth.json
+
+# 사용자 업로드 폴더
+/uploads
+
 # Created by 
 https://www.toptal.com/developers/gitignore/api/node,visualstudiocode,jetbrains,macos,windows
 # Edit at 
