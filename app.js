@@ -6,6 +6,19 @@ const express = require('express');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 
+// Multer(파일 업로드)
+const path = require("path");
+const multer = require("multer");
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, __dirname + "/uploads/");
+    },
+    filename: function (req, file, cb) {
+        cb(null, new Date().valueOf() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
+
 // Template Engine
 const ejs = require('ejs');
 
@@ -45,11 +58,38 @@ app.use(session({
     },
 }));
 
+// 
+//
+// index
+//
+//
 // 랜딩 페이지
 app.get('/', function (req, res) {
     res.send("Hello, world!");
 });
 
+// 에러 페이지로 이동
+function sendError(res, message, redirect) {
+    res.redirect("/error?message=" + message + "&redirect=" + redirect);
+}
+
+// 에러 페이지
+app.get('/error', function (req, res) {
+    const message = req.query.message;
+    const redirect = req.query.redirect;
+    res.render("alert", { message: message, redirect: redirect });
+});
+
+// favicon
+app.get('/favicon', function(req, res) {
+
+});
+
+//
+//
+// 로그인
+//
+//
 // 로그인 페이지
 app.get('/login', function (req, res) {
     res.sendFile(__dirname + '/static/login.html');
@@ -82,7 +122,7 @@ app.post('/login', function (req, res) {
             req.session.user.userPw = result[0].userPw;
             req.session.user.salt = result[0].salt;
             req.session.user.username = result[0].username;
-            req.session.save(function(error) {
+            req.session.save(function (error) {
                 if (error) throw error;
                 res.send("logged in");
             })
@@ -93,7 +133,8 @@ app.post('/login', function (req, res) {
     });
 });
 
-app.get("/login-info", function(req, res) {
+// 로그인 테스트
+app.get("/login-info", function (req, res) {
     const user = req.session.user;
     if (user != null) {
         res.send("logged in to " + user.username);
@@ -104,7 +145,7 @@ app.get("/login-info", function(req, res) {
 
 // 로그아웃
 app.get("/logout", function (req, res) {
-    req.session.destroy(function(error) {
+    req.session.destroy(function (error) {
         if (error) throw error;
         res.send("logged out");
     });
@@ -129,9 +170,46 @@ app.post('/register', function (req, res) {
     });
 });
 
+//
+//
+// 프로필 설정
+//
+//
+// 프로필 설정 페이지
+app.get("/u/:userId/profile", function (req, res) {
+    const sUserId = req.session.user.userId;
+    const userId = req.params.userId;
+
+    console.log("sUserId: " + sUserId + ", userId: " + userId);
+    
+    if (sUserId != undefined && userId == sUserId) {
+        res.sendFile(__dirname + "/static/edit_profile.html");
+    } else {
+        sendError(res, "로그인해주세요", "/login");
+    }
+});
+
+// 프로필 설정
+app.post("/u/:userId/profile", function (req, res) {
+    const sUserId = req.session.user.userId;
+    const userId = req.params.userId;
+
+    if (sUserId != undefined && userId == sUserId) {
+        res.sendFile("/static/edit_profile.html");
+    } else {
+        sendError(res, "로그인해주세요", "/login");
+    }
+
+});
+
+//
+//
+// 포트폴리오 페이지
+//
+//
 // 개인 페이지
-app.get('/:userId', function (req, res) {
-    var sUserId = req.session.userId;
+app.get('/u/:userId', function (req, res) {
+    var sUserId = req.session.user.userId;
     var userId = req.params.userId;
 
     var isEditable = sUserId != undefined && userId == sUserId;
@@ -143,7 +221,7 @@ app.get('/:userId', function (req, res) {
 });
 
 // 개인 페이지의 포트폴리오 상세보기
-app.get('/:userId/:portfolioId', function (req, res) {
+app.get('/u/:userId/:portfolioId', function (req, res) {
     var userId = req.params.userId;
     var portfolioId = req.params.portfolioId;
 
@@ -153,6 +231,22 @@ app.get('/:userId/:portfolioId', function (req, res) {
     });
 });
 
+// 개인 포트폴리오 작성
+app.get('/u/:userId/write', function (req, res) {
+    var userId = req.params.userId;
+    var portfolioId = req.params.portfolioId;
+
+    var sql = "select * from user where userId = ?;";
+    db.query(sql, [userId], function (error, result) {
+        if (error) throw error;
+    });
+});
+
+//
+//
+// 서버 실행
+//
+//
 // hostname 및 port 설정
 const hostname = '127.0.0.1';
 const port = 8080;
@@ -162,6 +256,11 @@ server.listen(port, hostname, function () {
     console.log("Server is listening on port 8080");
 });
 
+//
+//
+// 암호화
+//
+//
 // SHA-256 암호화 사용을 위한 crypto 설치
 const crypto = require('crypto');
 
