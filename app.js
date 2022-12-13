@@ -93,8 +93,8 @@ app.post('/login', function (req, res) {
         if (error) throw error;
 
         if (result == null || result.length <= 0) {
-            // TODO: 미가입된 아이디 처리
-            res.send('no user');
+            // 미가입된 아이디 처리
+            sendError(res, "회원가입을 해주세요.", "/login");
             return;
         }
 
@@ -166,12 +166,22 @@ app.post('/register', function (req, res) {
 app.get('/u/:userId/profile', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
-    
-    if (sUser != undefined && userId == sUser.userId) {
-        res.sendFile(__dirname + '/static/edit_profile.html');
-    } else {
+
+    if (sUser == undefined || userId != sUser.userId) {
         sendError(res, '로그인해주세요', '/login');
+        return;
     }
+    
+    const sql = 'select username, introduce, specialty from user where userId = ?;';
+    db.query(sql, [userId], function (error, result) {
+        if (error) throw error;
+        res.render('edit_profile', { 
+            userId: userId, 
+            username: result[0].username, 
+            introduce: result[0].introduce,  
+            specialty: result[0].specialty
+        });
+    });
 });
 
 // 프로필 설정
@@ -179,17 +189,19 @@ app.post('/u/:userId/profile', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
-    if (sUser != undefined && userId == sUser.userId) {
-        res.sendFile('/static/edit_profile.html');
-    } else {
+    if (sUser == undefined || userId != sUser.userId) {
         sendError(res, '로그인해주세요', '/login');
+        return;
     }
 
+    // request body에서 데이터 가져오기
+    const username = req.body.username;
     const introduce = req.body.introduce;
     const specialty = req.body.specialty;
 
-    const sql = "update user set introduce = ?, specialty = ? where userId = ?;";
-    db.query(sql, [introduce, specialty, userId], function (error, result) {
+    const sql = "update user set username = ?, introduce = ?, specialty = ? where userId = ?;";
+    db.query(sql, [username, introduce, specialty, userId], function (error, result) {
+        if (error) throw error;
         res.redirect('/u/' + userId);
     });
 });
@@ -219,11 +231,11 @@ app.get('/u/:userId/:portfolioId', function (req, res) {
     const userId = req.params.userId;
     var portfolioId = req.params.portfolioId;
 
-    if (sUser != undefined && userId == sUser.userId) {
-        res.sendFile('/static/edit_profile.html');
-    } else {
-        sendError(res, '로그인해주세요', '/login');
-    }
+    // if (sUser != undefined && userId == sUser.userId) {
+    //     res.sendFile('/static/edit_profile.html');
+    // } else {
+    //     sendError(res, '로그인해주세요', '/login');
+    // }
 
     var sql = 'select * from user where userId = ?;';
     db.query(sql, [userId], function (error, result) {
@@ -277,7 +289,7 @@ app.get('/u/:userId/activity', function (req, res) {
 });
 
 // 활동 작성 요청 처리
-app.get('/u/:userId/activity', function (req, res) {
+app.post('/u/:userId/activity', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
@@ -300,7 +312,7 @@ app.get('/u/:userId/activity', function (req, res) {
 });
 
 // 수상기록 작성 요청 처리
-app.get('/u/:userId/award', function (req, res) {
+app.post('/u/:userId/award', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
