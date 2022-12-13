@@ -6,33 +6,20 @@ const express = require('express');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 
-// Multer(파일 업로드)
-const path = require("path");
-const multer = require("multer");
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, __dirname + "/uploads/");
-    },
-    filename: function (req, file, cb) {
-        cb(null, new Date().valueOf() + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage: storage });
-
 // Template Engine
 const ejs = require('ejs');
 
 // Database
 const mysql = require('mysql');
 const fs = require('fs');
-const db_auth = JSON.parse(fs.readFileSync(__dirname + "/db_auth.json"));
+const db_auth = JSON.parse(fs.readFileSync(__dirname + '/db_auth.json'));
 
 // DB Initialzation
 const db = mysql.createConnection({
-    host: "localhost",
+    host: 'localhost',
     user: db_auth.user,
     password: db_auth.password,
-    database: "protofolio"
+    database: 'protofolio'
 });
 
 const app = express();
@@ -65,19 +52,19 @@ app.use(session({
 //
 // 랜딩 페이지
 app.get('/', function (req, res) {
-    res.send("Hello, world!");
+    res.sendFile(__dirname + "/index.html");
 });
 
 // 에러 페이지로 이동
 function sendError(res, message, redirect) {
-    res.redirect("/error?message=" + message + "&redirect=" + redirect);
+    res.redirect('/error?message=' + message + '&redirect=' + redirect);
 }
 
 // 에러 페이지
 app.get('/error', function (req, res) {
     const message = req.query.message;
     const redirect = req.query.redirect;
-    res.render("alert", { message: message, redirect: redirect });
+    res.render('alert', { message: message, redirect: redirect });
 });
 
 // favicon
@@ -101,13 +88,13 @@ app.post('/login', function (req, res) {
     var userId = req.body.userId;
     var userPw = req.body.userPw;
 
-    var sql = "select * from user where userId = ?;";
+    var sql = 'select * from user where userId = ?;';
     db.query(sql, [userId], function (error, result) {
         if (error) throw error;
 
         if (result == null || result.length <= 0) {
             // TODO: 미가입된 아이디 처리
-            res.send("no user");
+            res.send('no user');
             return;
         }
 
@@ -124,30 +111,30 @@ app.post('/login', function (req, res) {
             req.session.user.username = result[0].username;
             req.session.save(function (error) {
                 if (error) throw error;
-                res.send("logged in");
+                res.send('logged in');
             })
         } else {
-            res.send("wrong pw");
+            res.send('wrong pw');
         }
 
     });
 });
 
 // 로그인 테스트
-app.get("/login-info", function (req, res) {
+app.get('/login-info', function (req, res) {
     const user = req.session.user;
     if (user != null) {
-        res.send("logged in to " + user.username);
+        res.send('logged in to ' + user.username);
     } else {
-        res.send("not logged in");
+        res.send('not logged in');
     }
 });
 
 // 로그아웃
-app.get("/logout", function (req, res) {
+app.get('/logout', function (req, res) {
     req.session.destroy(function (error) {
         if (error) throw error;
-        res.send("logged out");
+        res.send('logged out');
     });
 });
 
@@ -162,11 +149,11 @@ app.post('/register', function (req, res) {
     // 비밀번호 SHA-256으로 해싱
     var encrypted = encrypt(userPw, salt);
 
-    // DB에 삽입
-    var sql = "insert into user(userId, userPw, salt, username) values (?, ?, ?, ?);";
+    // DB에 회원정보 삽입
+    var sql = 'insert into user(userId, userPw, salt, username) values (?, ?, ?, ?);';
     db.query(sql, [userId, encrypted, salt, username], function (error, result) {
         if (error) throw error;
-        res.redirect("/login");
+        res.redirect('/login');
     });
 });
 
@@ -176,30 +163,35 @@ app.post('/register', function (req, res) {
 //
 //
 // 프로필 설정 페이지
-app.get("/u/:userId/profile", function (req, res) {
-    const sUserId = req.session.user.userId;
+app.get('/u/:userId/profile', function (req, res) {
+    const sUser = req.session.user;
     const userId = req.params.userId;
-
-    console.log("sUserId: " + sUserId + ", userId: " + userId);
     
-    if (sUserId != undefined && userId == sUserId) {
-        res.sendFile(__dirname + "/static/edit_profile.html");
+    if (sUser != undefined && userId == sUser.userId) {
+        res.sendFile(__dirname + '/static/edit_profile.html');
     } else {
-        sendError(res, "로그인해주세요", "/login");
+        sendError(res, '로그인해주세요', '/login');
     }
 });
 
 // 프로필 설정
-app.post("/u/:userId/profile", function (req, res) {
-    const sUserId = req.session.user.userId;
+app.post('/u/:userId/profile', function (req, res) {
+    const sUser = req.session.user;
     const userId = req.params.userId;
 
-    if (sUserId != undefined && userId == sUserId) {
-        res.sendFile("/static/edit_profile.html");
+    if (sUser != undefined && userId == sUser.userId) {
+        res.sendFile('/static/edit_profile.html');
     } else {
-        sendError(res, "로그인해주세요", "/login");
+        sendError(res, '로그인해주세요', '/login');
     }
 
+    const introduce = req.body.introduce;
+    const specialty = req.body.specialty;
+
+    const sql = "update user set introduce = ?, specialty = ? where userId = ?;";
+    db.query(sql, [introduce, specialty, userId], function (error, result) {
+        res.redirect('/u/' + userId);
+    });
 });
 
 //
@@ -209,23 +201,31 @@ app.post("/u/:userId/profile", function (req, res) {
 //
 // 개인 페이지
 app.get('/u/:userId', function (req, res) {
-    var sUserId = req.session.user.userId;
-    var userId = req.params.userId;
+    const sUser = req.session.user;
+    const userId = req.params.userId;
 
-    var isEditable = sUserId != undefined && userId == sUserId;
+    var isEditable = sUser != undefined && userId == sUser.userId;
 
-    var sql = "select * from portfolio where userId = ?;";
+    var sql = 'select * from portfolio where userId = ?;';
     db.query(sql, [userId], function (error, result) {
         if (error) throw error;
+        res.render('portfolio', { isEditable: isEditable, data: result });
     });
 });
 
 // 개인 페이지의 포트폴리오 상세보기
 app.get('/u/:userId/:portfolioId', function (req, res) {
-    var userId = req.params.userId;
+    const sUser = req.session.user;
+    const userId = req.params.userId;
     var portfolioId = req.params.portfolioId;
 
-    var sql = "select * from user where userId = ?;";
+    if (sUser != undefined && userId == sUser.userId) {
+        res.sendFile('/static/edit_profile.html');
+    } else {
+        sendError(res, '로그인해주세요', '/login');
+    }
+
+    var sql = 'select * from user where userId = ?;';
     db.query(sql, [userId], function (error, result) {
         if (error) throw error;
     });
@@ -233,12 +233,92 @@ app.get('/u/:userId/:portfolioId', function (req, res) {
 
 // 개인 포트폴리오 작성
 app.get('/u/:userId/write', function (req, res) {
-    var userId = req.params.userId;
-    var portfolioId = req.params.portfolioId;
+    const sUser = req.session.user;
+    const userId = req.params.userId;
 
-    var sql = "select * from user where userId = ?;";
-    db.query(sql, [userId], function (error, result) {
+    if (sUser != undefined && userId == sUser.userId) {
+        res.render('write_project', { userId: userId });
+    } else {
+        sendError(res, '로그인해주세요', '/login');
+    }
+});
+
+// 개인 포트폴리오 작성 요청 처리
+app.post('/u/:userId/write', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    // request body에서 글쓰기 정보 가져오기
+    const title = req.body.title;
+    const content = req.body.content;
+
+    var sql = 'insert into portfolio(userId, title, content) values (?, ?, ?);';
+    db.query(sql, [userId, title, content], function (error, result) {
         if (error) throw error;
+        res.redirect('/u/' + userId);
+    });
+});
+
+// 활동 작성 페이지
+app.get('/u/:userId/activity', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+
+    if (sUser != undefined && userId == sUser.userId) {
+        res.render('write_activity', { userId: userId });
+    } else {
+        sendError(res, '로그인해주세요', '/login');
+    }
+});
+
+// 활동 작성 요청 처리
+app.get('/u/:userId/activity', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    // 활동 내용
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const activityName = req.body.activityName;
+    const activityDetail = req.body.activityDetail;
+
+    const sql = 'insert into activity (startDate, endDate, activityName, activityDetail, userId) values (?, ?, ?, ?, ?);';
+    db.query(sql, [startDate, endDate, activityName, activityDetail, userId], function (error, result) {
+        if (error) throw error;
+        res.redirect('/u/' + userId);
+    });
+});
+
+// 수상기록 작성 요청 처리
+app.get('/u/:userId/award', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+
+    if (sUser == undefined || userId != sUser.userId) {
+        sendError(res, '로그인해주세요', '/login');
+        return;
+    }
+
+    // 수상 내용 가져오기
+    const date = req.body.date;
+    const awardName = req.body.awardName;
+    const prizeName = req.body.prizeName;
+    const prizeIcon = req.body.prizeIcon;
+    
+    const sql = 'insert into award(date, awardName, prizeName, prizeIcon, userId) values (?, ?, ?, ?, ?);'
+    db.query(sql, [date, awardName, prizeName, prizeIcon, userId], function (error, result) {
+        if (error) throw error;
+        res.redirect('/u/' + userId);
     });
 });
 
@@ -253,7 +333,7 @@ const port = 8080;
 
 // 서버 생성
 server.listen(port, hostname, function () {
-    console.log("Server is listening on port 8080");
+    console.log('Server is listening on port 8080');
 });
 
 //
