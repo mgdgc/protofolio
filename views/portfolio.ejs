@@ -79,9 +79,10 @@
                 success: function (data, status, xhr) {
                     var str = "";
                     for (var i = 0; i < data.length; i++) {
+                        str += '<a href="/u/<%= username%>/project/' + data[i].docId + '/edit';
                         str += '<div class="content neumorph-card flex-column flex-fill col-5 col-lg-4 p-3 m-3">';
                         str += '<header><h6>' + data[i].title + '</h6></header>';
-                        str += '<p>' + data[i].content + '</p></div>';
+                        str += '<p>' + data[i].content + '</p></div></a>';
                     }
                     $("#projects").html(str);
                 },
@@ -99,9 +100,11 @@
                 success: function (data, status, xhr) {
                     var str = "";
                     for (var i = 0; i < data.length; i++) {
+                        str += '<a href="/u/<%= username%>/activity/' + data[i].docId + '/edit';
                         str += '<div class="content neumorph-card flex-column flex-fill col-5 col-lg-4 p-3 m-3">';
                         str += '<header><h6>' + data[i].startDate + ' ~ ' + data[i].endDate + '</h6></header>';
-                        str += '<p>' + data[i].activityName + '</p></div>';
+                        str += '<p>' + data[i].activityDetail + '</p>';
+                        str += '<p>' + data[i].activityName + '</p></div></a>';
                     }
                     $("#activities").html(str);
                 },
@@ -122,9 +125,10 @@
                         var icons = ["🏅", "🥇", "🥈", "🥉", "👍"];
                         var prizeIcon = icons[data[i].prizeIcon % icons.length];
 
+                        str += '<a href="/u/<%= username%>/award/' + data[i].awardId + '/edit';
                         str += '<div class="content neumorph-card flex-column flex-fill col-5 col-lg-4 p-3 m-3">';
                         str += '<header><h6>' + data[i].date + '</h6></header>';
-                        str += '<p>' + prizeIcon + data[i].prizeName + '  [' + data[i].awardName + ']</p></div>';
+                        str += '<p>' + prizeIcon + data[i].prizeName + '  <b>' + data[i].awardName + '</b></p></div></a>';
                     }
                     $("#award").html(str);
                 },

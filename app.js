@@ -237,7 +237,7 @@ app.get('/u/:userId', function (req, res) {
 
 });
 
-// project get api
+// project list get api
 app.get('/u/:userId/project', function (req, res) {
     const userId = req.params.userId;
 
@@ -248,7 +248,7 @@ app.get('/u/:userId/project', function (req, res) {
     });
 });
 
-// activity get api
+// project get api
 app.get('/u/:userId/project/:portfolioId', function (req, res) {
     const userId = req.params.userId;
     const portfolioId = req.params.portfolioId;
@@ -298,6 +298,73 @@ app.post('/u/:userId/write', function (req, res) {
         if (error) throw error;
         res.redirect('/u/' + userId);
     });
+});
+
+// 프로젝트 수정 페이지
+app.get('/u/:userId/project/:docId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const docId = req.params.docId;
+
+    if (sUser != undefined && userId == sUser.userId) {
+        const userSql = 'select userId, username from user where userId = ?;';
+        db.query(userSql, [userId], function (e, users) {
+            if (e) throw e;
+
+            const username = users[0].username;
+            const introduce = users[0].introduce;
+
+            const sql = 'select * from portfolio where docId = ?;';
+            db.query(sql, [docId], function (error, data) {
+                res.render('edit_project', {
+                    userId: users[0].userId,
+                    username: users[0].username,
+                    data: data[0]
+                });
+            });
+        });
+    } else {
+        sendError(res, '로그인해주세요', '/login');
+    }
+});
+
+// 프로젝트 수정 요청 처리
+app.post('/u/:userId/project/:docId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const docId = req.params.docId;
+
+    if (sUser != undefined && userId == sUser.userId) {
+
+        const title = req.body.title;
+        const content = req.body.content;
+
+        const sql = 'update portfolio set title = ?, content = ? where docId = ?;';
+        db.query(sql, [title, content, docId], function (e, result) {
+            if (e) throw e;
+            res.redirect('/u/' + userId);
+        });
+    } else {
+        sendError(res, '로그인해주세요', '/login');
+    }
+});
+
+// 프로젝트 삭제 요청 처리
+app.post('/u/:userId/project/:docId/edit', function (req, res) {
+    const sUser = req.session.user;
+    const userId = req.params.userId;
+    const docId = req.params.docId;
+
+    if (sUser != undefined && userId == sUser.userId) {
+
+        const sql = 'delete from portfolio where docId = ?;';
+        db.query(sql, [docId], function (e, result) {
+            if (e) throw e;
+            res.redirect('/u/' + userId);
+        });
+    } else {
+        sendError(res, '로그인해주세요', '/login');
+    }
 });
 
 //
@@ -511,11 +578,11 @@ app.get('/u/:userId/award/:awardId/edit', function (req, res) {
             if (e) throw e;
 
             const username = users[0].username;
-            res.render("edit_award", { 
-                userId: userId, 
+            res.render("edit_award", {
+                userId: userId,
                 username: username,
-                awardId: awardId, 
-                data: result[0] 
+                awardId: awardId,
+                data: result[0]
             });
         });
     });
