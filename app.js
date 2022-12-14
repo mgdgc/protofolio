@@ -114,7 +114,7 @@ app.post('/login', function (req, res) {
                 res.redirect('/u/' + userId);
             })
         } else {
-            res.send('wrong pw');
+            sendError(res, "비밀번호가 다릅니다.", "/login");
         }
 
     });
@@ -134,7 +134,7 @@ app.get('/login-info', function (req, res) {
 app.get('/logout', function (req, res) {
     req.session.destroy(function (error) {
         if (error) throw error;
-        res.send('logged out');
+        res.redirect('/');
     });
 });
 
@@ -266,7 +266,14 @@ app.get('/u/:userId/write', function (req, res) {
     const userId = req.params.userId;
 
     if (sUser != undefined && userId == sUser.userId) {
-        res.render('write_project', { userId: userId });
+        const userSql = 'select userId, username from user where userId = ?;';
+        db.query(userSql, [userId], function (e, users) {
+            if (e) throw e;
+
+            const username = users[0].username;
+            const introduce = users[0].introduce;
+            res.render('write_project', { userId: users[0].userId, username: users[0].username });
+        });
     } else {
         sendError(res, '로그인해주세요', '/login');
     }
@@ -326,8 +333,13 @@ app.get('/u/:userId/write/activity', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
 
+
     if (sUser != undefined && userId == sUser.userId) {
-        res.render('write_activity', { userId: userId });
+        const userSql = 'select userId, username from user where userId = ?;';
+        db.query(userSql, [userId], function (e, users) {
+            if (e) throw e;
+            res.render('write_activity', { userId: users[0].userId, username: users[0].username });
+        });
     } else {
         sendError(res, '로그인해주세요', '/login');
     }
@@ -370,7 +382,19 @@ app.get('/u/:userId/activity/:activityId/edit', function (req, res) {
     const sql = 'select * from activity where activityId = ?;';
     db.query(sql, [activityId], function (error, result) {
         if (error) throw error;
-        res.render("edit_activity", { userId: userId, activityId: activityId, data: result[0] });
+
+        const userSql = 'select userId, username from user where userId = ?;';
+        db.query(userSql, [userId], function (e, users) {
+            if (e) throw e;
+
+            res.render('edit_activity', {
+                userId: users[0].userId,
+                username: users[0].username,
+                activityId: activityId,
+                data: result[0]
+            });
+        });
+
     });
 });
 
@@ -433,7 +457,7 @@ app.get('/u/:userId/award', function (req, res) {
 });
 
 // award get api
-app.get('/u/:userId/activity/:awardId', function (req, res) {
+app.get('/u/:userId/award/:awardId', function (req, res) {
     const userId = req.params.userId;
     const awardId = req.params.awardId;
 
@@ -481,7 +505,19 @@ app.get('/u/:userId/award/:awardId/edit', function (req, res) {
     const sql = 'select * from award where awardId = ?;';
     db.query(sql, [awardId], function (error, result) {
         if (error) throw error;
-        res.render("edit_award", { userId: userId, awardId: awardId, data: result[0] });
+
+        const userSql = 'select userId, username from user where userId = ?;';
+        db.query(userSql, [userId], function (e, users) {
+            if (e) throw e;
+
+            const username = users[0].username;
+            res.render("edit_award", { 
+                userId: userId, 
+                username: username,
+                awardId: awardId, 
+                data: result[0] 
+            });
+        });
     });
 });
 
@@ -534,7 +570,7 @@ app.post('/u/:userId/award/:awardId/delete', function (req, res) {
 //
 // hostname 및 port 설정
 const hostname = '127.0.0.1';
-const port = 8080;
+const port = 80;
 
 // 서버 생성
 server.listen(port, hostname, function () {
