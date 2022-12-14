@@ -61,7 +61,7 @@
   </nav>
     <div class="container">
         <h2>만든 작품들 소개🙌</h2>
-        <form action="/u/<%= userId %>/write" method="post">
+        <form action="/u/<%= userId %>/project/<%= data.docId %>/edit" method="post">
             <div class="form-group">
                 <label for="title">제목</label>
                 <input type="text" class="form-control" id="title" placeholder="제목 입력" name="title" maxlength="100" value="<%= data.title %>"
@@ -71,7 +71,7 @@
                 <label for="content">내용</label>
                 <textarea class="form-control" rows="5" id="content" name="content" placeholder="누구랑 만들었는지,무엇을 만들었는지 작성"><%= data.content %></textarea>
             </div>
-            <button type="submit" class="btn btn-outline-dark">추가</button>
+            <button type="submit" class="btn btn-outline-dark">수정</button>
             <a type="button" class="btn btn-outline-danger" href="/u/<%= userId %>/project/<%= data.docId %>/delete">삭제</a>
         </form>
     </div>

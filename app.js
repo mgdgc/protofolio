@@ -350,7 +350,7 @@ app.post('/u/:userId/project/:docId/edit', function (req, res) {
 });
 
 // 프로젝트 삭제 요청 처리
-app.post('/u/:userId/project/:docId/edit', function (req, res) {
+app.get('/u/:userId/project/:docId/delete', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
     const docId = req.params.docId;
@@ -490,7 +490,7 @@ app.post('/u/:userId/activity/:activityId/edit', function (req, res) {
 });
 
 // 활동 삭제 요청 처리
-app.post('/u/:userId/activity/:activityId/delete', function (req, res) {
+app.get('/u/:userId/activity/:activityId/delete', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
     const activityId = req.params.activityId;
@@ -613,7 +613,7 @@ app.post('/u/:userId/award/:awardId/edit', function (req, res) {
 });
 
 // 수상기록 삭제 요청 처리
-app.post('/u/:userId/award/:awardId/delete', function (req, res) {
+app.get('/u/:userId/award/:awardId/delete', function (req, res) {
     const sUser = req.session.user;
     const userId = req.params.userId;
     const awardId = req.params.awardId;
@@ -636,8 +636,8 @@ app.post('/u/:userId/award/:awardId/delete', function (req, res) {
 //
 //
 // hostname 및 port 설정
-const hostname = '127.0.0.1';
-const port = 8080;
+const hostname = '158.247.204.111';
+const port = 80;
 
 // 서버 생성
 server.listen(port, hostname, function () {
