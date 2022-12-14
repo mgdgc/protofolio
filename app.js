@@ -570,7 +570,7 @@ app.post('/u/:userId/award/:awardId/delete', function (req, res) {
 //
 // hostname 및 port 설정
 const hostname = '127.0.0.1';
-const port = 80;
+const port = 8080;
 
 // 서버 생성
 server.listen(port, hostname, function () {
